@@ -40,6 +40,26 @@ if [ -z "${S3_BUCKET}" ]; then
   exit 1
 fi
 
+skipped_tables_part = ""
+
+if [ -z "${SKIPPED_TABLES}" ]; then
+
+
+IFS=', ' read -r -a value_array <<EOF
+$SKIPPED_TABLES
+EOF
+
+  result=""
+
+  for value in ${value_array[@]}; do
+    result="${result}--skip-table=${value} "
+  done
+
+  skipped_tables_part=$result
+
+fi
+
+
 date=$(date '+%Y-%m-%d')
 
 filename=/tmp/data/$DATABASE_NAME-$date.gz
@@ -50,6 +70,6 @@ fi
 
 echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename"
 
-mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
+mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $skipped_tables_part --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
 
 s3cmd put $filename s3://$S3_BUCKET
