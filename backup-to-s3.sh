@@ -50,6 +50,6 @@ fi
 
 echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename"
 
-mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events --column-statistics=0 $DATABASE_NAME | gzip > $filename
+mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
 
 s3cmd put $filename s3://$S3_BUCKET
