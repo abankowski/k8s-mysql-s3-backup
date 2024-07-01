@@ -8,7 +8,7 @@ if [ -z "${MYSQL_HOST}" ]; then
   exit 1
 fi
 
-if [ -z "${MYSQL_PORT}"] ; then
+if [ -z "${MYSQL_PORT}" ] ; then
   $MYSQL_PORT="3306"
 fi
 
@@ -40,10 +40,10 @@ if [ -z "${S3_BUCKET}" ]; then
   exit 1
 fi
 
-skipped_tables_part = ""
+skipped_tables_part=""
 
 if [ -z "${SKIPPED_TABLES}" ]; then
-
+  echo "Skipping data from tables $SKIPPED_TABLES"
 
 IFS=', ' read -r -a value_array <<EOF
 $SKIPPED_TABLES
