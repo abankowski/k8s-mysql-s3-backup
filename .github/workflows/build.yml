@@ -1,0 +1,33 @@
+name: Build and deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: false
+        description: Git ref to deploy
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    name: build image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - uses: tj-actions/branch-names@v5
+        id: branch-names
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          tags: ${{ steps.branch-names.outputs.current_branch }}
+          dockerfile: Dockerfile
+
