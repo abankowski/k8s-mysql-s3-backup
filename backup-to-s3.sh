@@ -1,14 +1,14 @@
 #!bin/sh
 set -e
 
-if [ -z "${MYSQL_HOST}"]; then
+if [ -z "${MYSQL_HOST}" ]; then
   echo "Environment variable MYSQL_HOST not present."
   echo "Valid configuration requires environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, DATABASE_NAME, and S3_BUCKET. MYSQL_PORT defaults to 3306."
   echo "Aborting."
   exit 1
 fi
 
-if [ -z "${MYSQL_PORT}"]; then
+if [ -z "${MYSQL_PORT}"] ; then
   $MYSQL_PORT="3306"
 fi
 
@@ -19,7 +19,7 @@ if [ -z "${MYSQL_USER}" ]; then
   exit 1
 fi
 
-if [ -z "${MYSQL_PASSWORD}"]; then
+if [ -z "${MYSQL_PASSWORD}" ]; then
   echo "Environment variable MYSQL_PASSWORD not present."
   echo "Valid configuration requires environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, DATABASE_NAME, and S3_BUCKET. MYSQL_PORT defaults to 3306."
   echo "Aborting."
