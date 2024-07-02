@@ -43,7 +43,6 @@ fi
 skipped_tables_part=""
 
 if [ -n "${SKIPPED_TABLES}" ]; then
-  echo "Skipping data from tables $SKIPPED_TABLES"
 
   tables=$(echo $SKIPPED_TABLES | tr "," "\n")
 
@@ -65,9 +64,11 @@ if [ -n "$1" ]; then
     filename=/tmp/data/$DATABASE_NAME-$date-$1.gz
 fi
 
-echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename skipping $skipped_tables_part"
+echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename skipping $SKIPPED_TABLES"
 
 mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $skipped_tables_part --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
 
-s3cmd put $filename s3://$S3_BUCKET
+s3cmd put $filename s3://$S3_BUCKET > /dev/null
+
+echo "Done."
 
