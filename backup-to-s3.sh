@@ -42,23 +42,20 @@ fi
 
 skipped_tables_part=""
 
-if [ -z "${SKIPPED_TABLES}" ]; then
+if [ -n "${SKIPPED_TABLES}" ]; then
   echo "Skipping data from tables $SKIPPED_TABLES"
 
-IFS=', ' read -r -a value_array <<EOF
-$SKIPPED_TABLES
-EOF
+  tables=$(echo $SKIPPED_TABLES | tr "," "\n")
 
   result=""
 
-  for value in ${value_array[@]}; do
-    result="${result}--skip-table=${value} "
+  for value in $tables; do
+    result="${result}--ignore-table=${value} "
   done
 
   skipped_tables_part=$result
 
 fi
-
 
 date=$(date '+%Y-%m-%d')
 
@@ -68,8 +65,9 @@ if [ -n "$1" ]; then
     filename=/tmp/data/$DATABASE_NAME-$date-$1.gz
 fi
 
-echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename"
+echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename skipping $skipped_tables_part"
 
 mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $skipped_tables_part --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
 
 s3cmd put $filename s3://$S3_BUCKET
+
