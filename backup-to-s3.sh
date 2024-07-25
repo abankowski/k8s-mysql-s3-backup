@@ -58,15 +58,22 @@ fi
 
 date=$(date '+%Y-%m-%d')
 
-filename=/tmp/data/$DATABASE_NAME-$date.gz
+filename=/tmp/data/$DATABASE_NAME-$date.tar
+filenameData=/tmp/data/$DATABASE_NAME-$date-data.gz
+filenameSchema=/tmp/data/$DATABASE_NAME-$date-schema.gz
 
 if [ -n "$1" ]; then
-    filename=/tmp/data/$DATABASE_NAME-$date-$1.gz
+    filenameData=/tmp/data/$DATABASE_NAME-$date-$1-data.gz
+    filenameSchema=/tmp/data/$DATABASE_NAME-$date-$1-schema.gz
 fi
 
-echo "Backup $DATABASE_NAME to $S3_BUCKET via $filename skipping $SKIPPED_TABLES"
+echo "Backup $DATABASE_NAME to $S3_BUCKET via $filenameData skipping $SKIPPED_TABLES"
 
-mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $skipped_tables_part --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filename
+mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD $skipped_tables_part --single-transaction --disable-keys --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filenameData
+
+mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD --no-data --skip-lock-tables --triggers --routines --events $DATABASE_NAME | gzip > $filenameSchema
+
+tar -cf $filename $filenameData $filenameSchema
 
 s3cmd put $filename s3://$S3_BUCKET > /dev/null
 
