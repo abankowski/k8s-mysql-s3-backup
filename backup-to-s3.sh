@@ -63,6 +63,7 @@ filenameData=/tmp/data/$DATABASE_NAME-$date-data.gz
 filenameSchema=/tmp/data/$DATABASE_NAME-$date-schema.gz
 
 if [ -n "$1" ]; then
+    filename=/tmp/data/$DATABASE_NAME-$date-$1.tar
     filenameData=/tmp/data/$DATABASE_NAME-$date-$1-data.gz
     filenameSchema=/tmp/data/$DATABASE_NAME-$date-$1-schema.gz
 fi
